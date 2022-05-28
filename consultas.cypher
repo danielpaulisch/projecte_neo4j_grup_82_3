@@ -22,6 +22,32 @@ return p, collect(p2)
 match (p:Persona)<-[:SAME_AS]->(n) where toLower(p.Nom)='miguel' and toLower(p.Cognom)='ballester'
 return n
 
+//Consulta 5
+match(p:Persona)-[:SAME_AS]-(n)
+where p.Nom = 'antonio' and p.Cognom = 'farran' 
+return n.Nom as Nom,n.Cognom as Cognom1,n.Segon_Cognom as Cognom2,"SAME_AS" as Tipus
+UNION ALL
+match(p:Persona)-[:FAMILIA]-(n) 
+where p.Nom = 'antonio' and p.Cognom = 'farran'
+return n.Nom as Nom,n.Cognom as Cognom1,n.Segon_Cognom as Cognom2,"FAMILIA" as Tipus
+
+//Consulta 6
+match (:Persona)-[x:FAMILIA]-(:Persona)
+where x.Relacio_Harmonitzada <> 'null'
+return distinct x.Relacio_Harmonitzada as Relacions_Familiars
+
+//Consulta 7
+match (h:Habitatge{Municipi:'SFLL'}) 
+where h.Carrer <> 'nan' and h.Numero <> 'nan' 
+return (h.Carrer) as Carrer, h.Numero as Numero_Carrer, count(distinct h.Any) as Total, collect(distinct h.Any) as Anys, collect(h.ID) as Ids 
+order by Total desc, h.Carrer, h.Numero limit 10
+
+//Consulta 8
+match(h:Habitatge)<-[:VIU]-(p:Persona)-[r:FAMILIA]->(n), (h:Habitatge)<-[:VIU]-(pe:Persona)-[re:FAMILIA]->(n) 
+where h.Municipi='CR' and (toLower(r.Relacio)='cap' or toLower(r.Relacio)='cabeza') and (toLower(re.Relacio)='hijo' or toLower(re.Relacio)='hija' or toLower(re.Relacio_Harmonitzada) = 'fill' or toLower(re.Relacio_Harmonitzada) = 'filla') 
+return distinct p.Nom as nombre, p.Cognom as apellido, p.Segon_Cognom as segundo_apellido, size(collect(pe)) as fills 
+order by fills DESC limit 20
+
 //Consulta 9
 match(h1:Habitatge) where h1.Any = 1881 and h1.Municipi = 'SFLL' with count(distinct(h1)) as num
 match(h:Habitatge)<-[:VIU]-(p:Persona)-[r:FAMILIA]->(n)
