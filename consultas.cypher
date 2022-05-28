@@ -48,14 +48,14 @@ order by Total desc, h.Carrer, h.Numero limit 10
 
 //Consulta 8
 match(h:Habitatge)<-[:VIU]-(p:Persona)-[r:FAMILIA]->(n), (h:Habitatge)<-[:VIU]-(pe:Persona)-[re:FAMILIA]->(n) 
-where h.Municipi='CR' and (toLower(r.Relacio)='cap' or toLower(r.Relacio)='cabeza') and (toLower(re.Relacio)='hijo' or toLower(re.Relacio)='hija' or toLower(re.Relacio_Harmonitzada) = 'fill' or toLower(re.Relacio_Harmonitzada) = 'filla') 
+where h.Municipi='CR' and (toLower(r.Relacio)='cap' or toLower(r.Relacio)='cabeza') and  (re.Relacio_Harmonitzada) STARTS WITH 'fill'
 return distinct p.Nom as nombre, p.Cognom as apellido, p.Segon_Cognom as segundo_apellido, size(collect(pe)) as fills 
 order by fills DESC limit 20
 
 //Consulta 9
 match(h1:Habitatge) where h1.Any = 1881 and h1.Municipi = 'SFLL' with count(distinct(h1)) as num
 match(h:Habitatge)<-[:VIU]-(p:Persona)-[r:FAMILIA]->(n)
-where h.Any = 1881 and h.Municipi = 'SFLL' (r.Relacio_Harmonitzada) STARTS WITH 'fill'
+where h.Any = 1881 and h.Municipi = 'SFLL'and (r.Relacio_Harmonitzada) STARTS WITH 'fill'
 return num as habitatges, count(distinct(p)) as fills, toFloat(count(distinct(p)))/toFloat(num) as mitjana
 
 //Consulta 10
